@@ -1,4 +1,4 @@
-#!D:\Python\Python34\python.exe
+#!/usr/bin/env python
 
 import cgi, requests, random, string, hashlib
 
@@ -39,11 +39,12 @@ def krankmelden(cookie, fromDate, toDate):
                'Referer': 'http://gymnasuim1.de/CJT.php', 'Content-Length': len(postdata),
                'Cookie': cookie, 'Pragma': 'no-cache', 'Cache-Control': 'no-cache',
                'Connection': 'keep-alive'}
-    url = "http://gymnasuim1.de/sqlSchuelerKrankmeldung.php"
-    if "200" in requests.post(url=url, headers=headers, data=postdata):
-        return "Krankmeldung von " + fromDate + " bis " + toDate + " erfolgreich"
-    else:
-        return "Ungueltiges Datum"
+    url = "http://gymnasium1.de/sqlSchuelerKrankmeldung.php"
+    return requests.post(url=url, headers=headers, data=postdata)
+    #if requests.post(url=url, headers=headers, data=postdata).status_code is 200:
+    #    return "Krankmeldung von " + fromDate + " bis " + toDate + " erfolgreich"
+    #else:
+    #    return "Ungueltiges Datum"
 
 
 try:
@@ -53,12 +54,12 @@ try:
     username = formData.getvalue('username')
     password = formData.getvalue('password')
     m = hashlib.md5()
-    m.update(password.encode("utf-8"))
+    m.update(password.encode('utf-8'))
     passhash = m.hexdigest()
     fromDate = formData.getvalue('fromdate')
     toDate = formData.getvalue('todate')
     htmlTop()
-    if "200" in login(username, passhash, cookie):
+    if login(username, passhash, cookie).status_code is 200:
         print(krankmelden(cookie=cookie, fromDate=fromDate, toDate=toDate))
     else:
         print("Ungueltiges Passwort oder Username")

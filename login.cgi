@@ -60,7 +60,7 @@ try:
     passhash = m.hexdigest()
     fromDate = formData.getvalue('fromdate')
     toDate = formData.getvalue('todate')
-    school = fromDate.getvalue('school')
+    school = formData.getvalue('school')
     htmlTop()
     print(login(username, passhash, cookie, schule=school, fromDate=fromDate, toDate=toDate))
     htmlTail()

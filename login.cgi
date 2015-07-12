@@ -28,7 +28,7 @@ def login(username, passHash, cookie, schule, fromDate, toDate):
                'Cookie': cookie, 'Pragma': 'no-cache', 'Cache-Control': 'no-cache',
                'Connection': 'keep-alive'}
     requests.post(url="http://gymnasium1.de/sqlVerbindungFestlegen.php",
-                        data=postdata, headers=headers).text
+                        data=postdata, headers=headers)
     postdata = "todo=Anmelden&name=" + username + "&passHash=" + passHash
     response = requests.post("http://gymnasium1.de/Anmeldung.php", headers=headers, data=postdata).text
     if "NO" in response:
@@ -60,8 +60,9 @@ try:
     passhash = m.hexdigest()
     fromDate = formData.getvalue('fromdate')
     toDate = formData.getvalue('todate')
+    school = fromDate.getvalue('school')
     htmlTop()
-    print(login(username, passhash, cookie, schule="CJTLauf", fromDate=fromDate, toDate=toDate))
+    print(login(username, passhash, cookie, schule=school, fromDate=fromDate, toDate=toDate))
     htmlTail()
 except:
     cgi.print_exception()

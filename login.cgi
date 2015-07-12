@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!D:\Python\Python34\python.exe
 
 import cgi, requests, random, string, hashlib
 
@@ -19,16 +19,20 @@ def htmlTail():
     </html>""")
 
 
-def login(username, passHash, cookie):
-    postdata = "todo=Anmelden&name=" + username + "&passHash=" + passHash
-
+def login(username, passHash, cookie, schule):
+    postdata = "verbindung=" + schule
     headers = {'Host': 'gymnasium1.de', 'Accept': '*/*',
                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                'X-Requested-With': 'XMLHttpRequest',
                'Referer': 'http://gymnasuim1.de/CJT.php', 'Content-Length': len(postdata),
                'Cookie': cookie, 'Pragma': 'no-cache', 'Cache-Control': 'no-cache',
                'Connection': 'keep-alive'}
-    response = requests.post("http://gymnasium1.de/Anmeldung.php", headers=headers, data=postdata)
+    print("Verbindung festlegen: <br><br>")
+    print(requests.post(url="http://gymnasium1.de/sqlVerbindungFestlegen.php",
+                        data=postdata, headers=headers).text)
+    postdata = "todo=Anmelden&name=" + username + "&passHash=" + passHash
+    response = requests.post("http://gymnasium1.de/Anmeldung.php", headers=headers, data=postdata).text
+    print("<br><br>Anmelden:<br><br>")
     return response
 
 
@@ -40,10 +44,11 @@ def krankmelden(cookie, fromDate, toDate):
                'Cookie': cookie, 'Pragma': 'no-cache', 'Cache-Control': 'no-cache',
                'Connection': 'keep-alive'}
     url = "http://gymnasium1.de/sqlSchuelerKrankmeldung.php"
-    return requests.post(url=url, headers=headers, data=postdata)
-    #if requests.post(url=url, headers=headers, data=postdata).status_code is 200:
+    print("<br><br>Krankmeldung:<br><br>")
+    return requests.post(url=url, headers=headers, data=postdata).text
+    # if requests.post(url=url, headers=headers, data=postdata).status_code is 200:
     #    return "Krankmeldung von " + fromDate + " bis " + toDate + " erfolgreich"
-    #else:
+    # else:
     #    return "Ungueltiges Datum"
 
 
@@ -59,11 +64,9 @@ try:
     fromDate = formData.getvalue('fromdate')
     toDate = formData.getvalue('todate')
     htmlTop()
-    if login(username, passhash, cookie).status_code is 200:
-        print(krankmelden(cookie=cookie, fromDate=fromDate, toDate=toDate))
-    else:
-        print("Ungueltiges Passwort oder Username")
-
+    print(login(username, passhash, cookie, schule="CJTLauf"))
+    print("<br><br><br><br>")
+    print(krankmelden(cookie=cookie, fromDate=fromDate, toDate=toDate))
     htmlTail()
 except:
     cgi.print_exception()

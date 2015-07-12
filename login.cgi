@@ -19,7 +19,7 @@ def htmlTail():
     </html>""")
 
 
-def login(username, passHash, cookie, schule):
+def login(username, passHash, cookie, schule, fromDate, toDate):
     postdata = "verbindung=" + schule
     headers = {'Host': 'gymnasium1.de', 'Accept': '*/*',
                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -27,13 +27,14 @@ def login(username, passHash, cookie, schule):
                'Referer': 'http://gymnasuim1.de/CJT.php', 'Content-Length': len(postdata),
                'Cookie': cookie, 'Pragma': 'no-cache', 'Cache-Control': 'no-cache',
                'Connection': 'keep-alive'}
-    print("Verbindung festlegen: <br><br>")
-    print(requests.post(url="http://gymnasium1.de/sqlVerbindungFestlegen.php",
-                        data=postdata, headers=headers).text)
+    requests.post(url="http://gymnasium1.de/sqlVerbindungFestlegen.php",
+                        data=postdata, headers=headers).text
     postdata = "todo=Anmelden&name=" + username + "&passHash=" + passHash
     response = requests.post("http://gymnasium1.de/Anmeldung.php", headers=headers, data=postdata).text
-    print("<br><br>Anmelden:<br><br>")
-    return response
+    if "NO" in response:
+        return "Falsches Passwort oder Benutzername"
+    else:
+        return krankmelden(cookie=cookie, fromDate=fromDate, toDate=toDate)
 
 
 def krankmelden(cookie, fromDate, toDate):
@@ -46,10 +47,6 @@ def krankmelden(cookie, fromDate, toDate):
     url = "http://gymnasium1.de/sqlSchuelerKrankmeldung.php"
     print("<br><br>Krankmeldung:<br><br>")
     return requests.post(url=url, headers=headers, data=postdata).text
-    # if requests.post(url=url, headers=headers, data=postdata).status_code is 200:
-    #    return "Krankmeldung von " + fromDate + " bis " + toDate + " erfolgreich"
-    # else:
-    #    return "Ungueltiges Datum"
 
 
 try:
@@ -64,9 +61,7 @@ try:
     fromDate = formData.getvalue('fromdate')
     toDate = formData.getvalue('todate')
     htmlTop()
-    print(login(username, passhash, cookie, schule="CJTLauf"))
-    print("<br><br><br><br>")
-    print(krankmelden(cookie=cookie, fromDate=fromDate, toDate=toDate))
+    print(login(username, passhash, cookie, schule="CJTLauf", fromDate=fromDate, toDate=toDate))
     htmlTail()
 except:
     cgi.print_exception()
